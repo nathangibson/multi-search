@@ -1,7 +1,7 @@
 # Memory Index
 
 ## Purpose
-<!-- One sentence describing what this project does -->
+Browser plugin to search multiple sites with a single query.
 
 ## Stack
 <!-- Key technologies, one line each -->
