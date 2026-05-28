@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "python3 .github/hooks/scripts/post-file-write.py",
+        "timeout": 5
+      }
+    ]
+  }
+}
