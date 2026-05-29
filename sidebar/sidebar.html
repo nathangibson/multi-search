@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Site Bibliography Search</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <img src="../icons/icon-48.png" alt="" class="logo" aria-hidden="true">
+      <h1>Bibliography Search</h1>
+    </header>
+
+    <main>
+      <section class="search-section">
+        <label for="query-input" class="visually-hidden">Search query</label>
+        <input
+          type="text"
+          id="query-input"
+          placeholder="Enter search query…"
+          aria-label="Search query"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </section>
+
+      <section class="sites-section" aria-label="Select sites to search">
+        <h2>Sites</h2>
+        <ul id="sites-list" role="list">
+          <!-- Populated by sidebar.js -->
+        </ul>
+      </section>
+
+      <div id="error-message" class="error-message" role="alert" aria-live="polite" hidden></div>
+
+      <button id="search-btn" type="button">Search</button>
+    </main>
+  </div>
+
+  <script type="module" src="sidebar.js"></script>
+</body>
+</html>
