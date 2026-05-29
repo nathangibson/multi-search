@@ -1,28 +1,25 @@
 // Sidebar script — search UI logic
 
-import { DEFAULT_SITES } from '../utils/sites.js';
 import { buildSearchUrl } from '../utils/urlBuilder.js';
-import { loadSelectedSites, saveSelectedSites } from '../storage/storage.js';
+import { loadSites, loadSelectedSites, saveSelectedSites } from '../storage/storage.js';
+
+let sites = [];
 
 const queryInput = document.getElementById('query-input');
 const sitesList = document.getElementById('sites-list');
 const searchBtn = document.getElementById('search-btn');
 const errorMessage = document.getElementById('error-message');
 
-// ── Initialisation ──────────────────────────────────────────
-
 async function init() {
-  const selectedIds = await loadSelectedSites();
-  renderSiteCheckboxes(selectedIds);
+  sites = await loadSites();
+  renderSiteCheckboxes(await loadSelectedSites());
   queryInput.focus();
 }
-
-// ── Render checkboxes ───────────────────────────────────────
 
 function renderSiteCheckboxes(selectedIds) {
   sitesList.innerHTML = '';
 
-  DEFAULT_SITES
+  sites
     .filter(site => site.enabled)
     .sort((a, b) => a.order - b.order)
     .forEach(site => {
@@ -45,15 +42,11 @@ function renderSiteCheckboxes(selectedIds) {
     });
 }
 
-// ── Persist checkbox state when user changes selection ──────
-
 async function onSelectionChange() {
   const selectedIds = getCheckedSiteIds();
   await saveSelectedSites(selectedIds);
   clearError();
 }
-
-// ── Search button handler ───────────────────────────────────
 
 searchBtn.addEventListener('click', handleSearch);
 queryInput.addEventListener('keydown', e => {
@@ -64,7 +57,6 @@ async function handleSearch() {
   const query = queryInput.value;
   const selectedIds = getCheckedSiteIds();
 
-  // Validate inputs
   if (!query.trim()) {
     showError('Please enter a search query.');
     queryInput.focus();
@@ -78,8 +70,7 @@ async function handleSearch() {
 
   clearError();
 
-  // Build search URLs for selected, enabled sites
-  const urls = DEFAULT_SITES
+  const urls = sites
     .filter(site => selectedIds.includes(site.id) && site.enabled)
     .sort((a, b) => a.order - b.order)
     .map(site => buildSearchUrl(site.searchTemplate, query));
@@ -97,8 +88,6 @@ async function handleSearch() {
   }
 }
 
-// ── Helpers ─────────────────────────────────────────────────
-
 function getCheckedSiteIds() {
   return Array.from(sitesList.querySelectorAll('input[type="checkbox"]:checked'))
     .map(cb => cb.value);
@@ -114,6 +103,8 @@ function clearError() {
   errorMessage.hidden = true;
 }
 
-// ── Start ────────────────────────────────────────────────────
+document.getElementById('settings-btn')?.addEventListener('click', () => {
+  browser.runtime.openOptionsPage();
+});
 
 init();

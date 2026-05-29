@@ -1,16 +1,20 @@
 # Site Persistence
 
 ## What it does
-Saves and restores which sites the user has checked in the sidebar, so selections survive page reloads and browser restarts.
+Saves and restores which sites the user has checked in the sidebar, and stores custom site configurations added via the settings page.
 
 ## Key Files
-- `storage/storage.js` — `loadSelectedSites()`, `saveSelectedSites(siteIds)`, `getDefaultSites()`
+- `storage/storage.js` — `loadSites()`, `saveSites()`, `loadSelectedSites()`, `saveSelectedSites()`, `getDefaultSites()`
+
+## Storage keys
+| Key | Value | Purpose |
+|-----|-------|---------|
+| `sites` | `Site[]` or absent | User's custom site list |
+| `selectedSites` | `string[]` | IDs of checked sites in sidebar |
 
 ## How it works
-- Uses `browser.storage.local` (all data stays local, no sync)
-- Stores a single key `selectedSites` → `string[]` of site IDs
-- On first use (no stored value or empty array): defaults to all enabled sites
-- Saves on every checkbox change event in the sidebar
+- `loadSites()`: returns stored array; if key is **null/absent**, returns DEFAULT_SITES; empty `[]` is respected (user cleared all)
+- `loadSelectedSites()`: if absent or empty, defaults to all enabled site IDs from DEFAULT_SITES
+- Both save functions fail silently (console.error) — storage errors don't crash the UI
+- `getDefaultSites()` returns the DEFAULT_SITES constant for use by the settings reset feature
 
-## Tradeoffs
-- Empty array is treated as "never saved" and falls back to all-selected default — users cannot intentionally persist zero selections (acceptable for MVP since zero selections prevent searching anyway)

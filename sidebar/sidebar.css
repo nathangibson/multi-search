@@ -44,6 +44,23 @@ header h1 {
   font-size: 14px;
   font-weight: 600;
   color: #1a1a1a;
+  flex: 1;
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #666;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.settings-btn:hover {
+  background: #f0f0f0;
+  color: #333;
 }
 
 /* ── Search input ─────────────────────────────────────────── */

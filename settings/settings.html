@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings – Bibliography Search</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Settings – Bibliography Search</h1>
+
+    <div id="status-msg" hidden></div>
+
+    <section>
+      <h2>Sites</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Search Template</th>
+            <th>Enabled</th>
+            <th>Order</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sites-tbody"></tbody>
+      </table>
+    </section>
+
+    <div class="toolbar">
+      <button id="add-btn" class="btn btn-primary">Add Site</button>
+      <button id="export-btn" class="btn btn-secondary">Export JSON</button>
+      <button id="import-btn" class="btn btn-secondary">Import JSON</button>
+      <button id="reset-btn" class="btn btn-danger">Reset to Defaults</button>
+    </div>
+
+    <input type="file" id="import-file" accept=".json" hidden>
+
+    <section id="site-form" hidden>
+      <h2>Add / Edit Site</h2>
+      <form>
+        <label for="form-name">Site Name</label>
+        <input id="form-name" type="text" placeholder="e.g. JSTOR" required>
+
+        <label for="form-template">Search URL Template <small>(must contain <code>{query}</code>)</small></label>
+        <div class="template-row">
+          <input id="form-template" type="text" placeholder="https://example.com/search?q={query}" required>
+          <button id="test-btn" type="button" class="btn btn-secondary">▶ Test</button>
+        </div>
+
+        <input id="form-id" type="hidden">
+
+        <div class="form-actions">
+          <button id="form-save" type="button" class="btn btn-primary">Save</button>
+          <button id="form-cancel" type="button" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="settings.js"></script>
+</body>
+</html>
