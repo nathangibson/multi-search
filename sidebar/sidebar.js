@@ -1,7 +1,7 @@
 // Sidebar script — search UI logic
 
 import { buildSearchUrl } from '../utils/urlBuilder.js';
-import { loadSites, loadSelectedSites, saveSelectedSites, loadSelectedMode, saveSelectedMode } from '../storage/storage.js';
+import { loadSites, loadSelectedSites, saveSelectedSites, loadSelectedMode, saveSelectedMode, loadLastQuery, saveLastQuery } from '../storage/storage.js';
 import { MODES } from '../utils/sites.js';
 
 let sites = [];
@@ -32,6 +32,7 @@ async function init() {
 async function loadModeData() {
   sites = await loadSites(currentMode);
   renderSiteCheckboxes(await loadSelectedSites(currentMode));
+  queryInput.value = await loadLastQuery(currentMode);
 }
 
 modeSelect.addEventListener('change', async () => {
@@ -94,6 +95,8 @@ async function handleSearch() {
   }
 
   clearError();
+
+  await saveLastQuery(currentMode, query.trim());
 
   const urls = sites
     .filter(site => selectedIds.includes(site.id) && site.enabled)

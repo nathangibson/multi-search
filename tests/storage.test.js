@@ -3,6 +3,7 @@ import {
   loadSites, saveSites,
   loadSelectedSites, saveSelectedSites,
   loadSelectedMode, saveSelectedMode,
+  loadLastQuery, saveLastQuery,
   getDefaultSites,
 } from '../storage/storage.js';
 import { DEFAULT_SITES } from '../utils/sites.js';
@@ -173,3 +174,61 @@ describe('getDefaultSites', () => {
   });
 });
 
+// ── loadLastQuery ─────────────────────────────────────────────
+
+describe('loadLastQuery', () => {
+  it('returns empty string when no data stored', async () => {
+    const result = await loadLastQuery('bibliography');
+    expect(result).toBe('');
+  });
+
+  it('returns stored query for the mode', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ lastQueryByMode: { bibliography: 'medieval manuscripts' } });
+    const result = await loadLastQuery('bibliography');
+    expect(result).toBe('medieval manuscripts');
+  });
+
+  it('returns empty string for a different mode with no data', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ lastQueryByMode: { bibliography: 'something' } });
+    const result = await loadLastQuery('images');
+    expect(result).toBe('');
+  });
+
+  it('returns empty string on storage error', async () => {
+    global.browser.storage.local.get = () => Promise.reject(new Error('storage fail'));
+    const result = await loadLastQuery('bibliography');
+    expect(result).toBe('');
+  });
+});
+
+// ── saveLastQuery ─────────────────────────────────────────────
+
+describe('saveLastQuery', () => {
+  it('saves query for a mode when no prior data exists', async () => {
+    await saveLastQuery('bibliography', 'gutenberg');
+    expect(lastSet).toEqual({ lastQueryByMode: { bibliography: 'gutenberg' } });
+  });
+
+  it('preserves queries for other modes when saving', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ lastQueryByMode: { images: 'illuminated' } });
+    await saveLastQuery('bibliography', 'gutenberg');
+    expect(lastSet).toEqual({
+      lastQueryByMode: { images: 'illuminated', bibliography: 'gutenberg' },
+    });
+  });
+
+  it('overwrites previous query for the same mode', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ lastQueryByMode: { bibliography: 'old query' } });
+    await saveLastQuery('bibliography', 'new query');
+    expect(lastSet).toEqual({ lastQueryByMode: { bibliography: 'new query' } });
+  });
+
+  it('does not throw on storage error', async () => {
+    global.browser.storage.local.get = () => Promise.reject(new Error('storage fail'));
+    await expect(saveLastQuery('bibliography', 'test')).resolves.toBeUndefined();
+  });
+});

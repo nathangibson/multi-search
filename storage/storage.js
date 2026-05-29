@@ -4,6 +4,7 @@
 import { DEFAULT_SITES, DEFAULT_SITES_BY_MODE } from '../utils/sites.js';
 
 const STORAGE_KEYS = {
+  LAST_QUERY_BY_MODE:     'lastQueryByMode',
   SITES_BY_MODE:          'sitesByMode',
   SELECTED_MODE:          'selectedMode',
   SELECTED_SITES_BY_MODE: 'selectedSitesByMode',
@@ -11,6 +12,29 @@ const STORAGE_KEYS = {
   LEGACY_SITES:           'sites',
   LEGACY_SELECTED_SITES:  'selectedSites',
 };
+
+// ── Last query (per mode) ─────────────────────────────────────
+
+export async function loadLastQuery(modeId) {
+  try {
+    const result = await browser.storage.local.get(STORAGE_KEYS.LAST_QUERY_BY_MODE);
+    return result.lastQueryByMode?.[modeId] ?? '';
+  } catch (error) {
+    console.error('Failed to load last query:', error);
+    return '';
+  }
+}
+
+export async function saveLastQuery(modeId, query) {
+  try {
+    const result = await browser.storage.local.get(STORAGE_KEYS.LAST_QUERY_BY_MODE);
+    const lastQueryByMode = result.lastQueryByMode ?? {};
+    lastQueryByMode[modeId] = query;
+    await browser.storage.local.set({ [STORAGE_KEYS.LAST_QUERY_BY_MODE]: lastQueryByMode });
+  } catch (error) {
+    console.error('Failed to save last query:', error);
+  }
+}
 
 // ── Mode selection ────────────────────────────────────────────
 

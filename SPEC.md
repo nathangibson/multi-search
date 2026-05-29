@@ -41,10 +41,9 @@ As a researcher, I want to search for bibliography items across multiple sites w
 
 ### 3. State Persistence
 - **Remember User Preferences**:
-  - Last selected (checked) sites
-  - Last search query (optional)
-  - Site configurations
-  - Sidebar open/closed state
+  - Last selected (checked) sites per mode
+  - Last search query per mode (pre-filled in search box on next open)
+  - Site configurations per mode
 
 - **Storage**: Use Firefox's `browser.storage.local` API
 
@@ -68,9 +67,6 @@ As a researcher, I want to search for bibliography items across multiple sites w
   
 - **Configuration Options**:
   - Site management interface (add/edit/remove)
-  - Default selections (which sites are checked by default)
-  - Tab behavior (whether to focus first tab, whether to pin tabs, etc.)
-  - Clear saved search queries
   - Export/import settings
 
 ## Technical Architecture
