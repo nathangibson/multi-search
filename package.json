@@ -1,0 +1,20 @@
+{
+  "name": "multi-search-plugin",
+  "version": "1.0.0",
+  "description": "Browser plugin to search multiple sites with a single query.",
+  "main": "background.js",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": ["./tests/setup.js"]
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
+  }
+}
