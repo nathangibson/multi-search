@@ -1,19 +1,13 @@
 // tests/storage.test.js
-import { loadSites, saveSites, loadSelectedSites, saveSelectedSites, getDefaultSites } from '../storage/storage.js';
+import {
+  loadSites, saveSites,
+  loadSelectedSites, saveSelectedSites,
+  loadSelectedMode, saveSelectedMode,
+  getDefaultSites,
+} from '../storage/storage.js';
 import { DEFAULT_SITES } from '../utils/sites.js';
 
-// Helper to override browser.storage.local.get for a single test
-function mockGet(returnValue) {
-  global.browser.storage.local.get = () => Promise.resolve(returnValue);
-}
-
 let lastSet;
-function mockSet() {
-  global.browser.storage.local.set = (value) => {
-    lastSet = value;
-    return Promise.resolve();
-  };
-}
 
 beforeEach(() => {
   lastSet = undefined;
@@ -24,29 +18,42 @@ beforeEach(() => {
 // ── loadSites ─────────────────────────────────────────────────
 
 describe('loadSites', () => {
-  it('returns DEFAULT_SITES when key is absent (result.sites is undefined)', async () => {
-    mockGet({});
-    const result = await loadSites();
+  it('returns DEFAULT_SITES for bibliography when sitesByMode is absent', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({});
+    const result = await loadSites('bibliography');
     expect(result).toEqual(DEFAULT_SITES);
   });
 
-  it('returns DEFAULT_SITES when result.sites is null', async () => {
-    mockGet({ sites: null });
-    const result = await loadSites();
-    expect(result).toEqual(DEFAULT_SITES);
+  it('returns [] for images when sitesByMode is absent (no defaults for images)', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({});
+    const result = await loadSites('images');
+    expect(result).toEqual([]);
   });
 
-  it('returns stored sites array when present', async () => {
+  it('returns stored sites for the requested mode', async () => {
     const stored = [{ id: 'a', name: 'A', searchTemplate: 'https://a.com/?q={query}', enabled: true, order: 0 }];
-    mockGet({ sites: stored });
-    const result = await loadSites();
+    global.browser.storage.local.get = () => Promise.resolve({ sitesByMode: { bibliography: stored } });
+    const result = await loadSites('bibliography');
     expect(result).toEqual(stored);
   });
 
-  it('respects an intentionally empty array [] (does NOT fall back to defaults)', async () => {
-    // Regression: old code had `result.sites.length === 0` which wrongly fell back to defaults
-    mockGet({ sites: [] });
-    const result = await loadSites();
+  it('respects an intentionally empty array [] for a mode', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({ sitesByMode: { bibliography: [] } });
+    const result = await loadSites('bibliography');
+    expect(result).toEqual([]);
+  });
+
+  it('uses legacy "sites" key as bibliography when sitesByMode is absent', async () => {
+    const legacy = [{ id: 'old', name: 'Old', searchTemplate: 'https://old.com/?q={query}', enabled: true, order: 0 }];
+    global.browser.storage.local.get = () => Promise.resolve({ sites: legacy });
+    const result = await loadSites('bibliography');
+    expect(result).toEqual(legacy);
+  });
+
+  it('does NOT apply legacy "sites" key to non-bibliography modes', async () => {
+    const legacy = [{ id: 'old', name: 'Old', searchTemplate: 'https://old.com/?q={query}', enabled: true, order: 0 }];
+    global.browser.storage.local.get = () => Promise.resolve({ sites: legacy });
+    const result = await loadSites('images');
     expect(result).toEqual([]);
   });
 });
@@ -54,67 +61,115 @@ describe('loadSites', () => {
 // ── saveSites ─────────────────────────────────────────────────
 
 describe('saveSites', () => {
-  it('writes sites to storage under the "sites" key', async () => {
-    const sites = [{ id: 'x', name: 'X', searchTemplate: 'https://x.com/?q={query}', enabled: true, order: 0 }];
-    await saveSites(sites);
-    expect(lastSet).toEqual({ sites });
+  it('merges into sitesByMode and writes to storage', async () => {
+    const existing = { images: [{ id: 'img1' }] };
+    global.browser.storage.local.get = () => Promise.resolve({ sitesByMode: existing });
+    const newSites = [{ id: 'x', name: 'X', searchTemplate: 'https://x.com/?q={query}', enabled: true, order: 0 }];
+    await saveSites('bibliography', newSites);
+    expect(lastSet).toEqual({ sitesByMode: { images: [{ id: 'img1' }], bibliography: newSites } });
   });
 
-  it('can save an empty array', async () => {
-    await saveSites([]);
-    expect(lastSet).toEqual({ sites: [] });
+  it('can save an empty array for a mode', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({});
+    await saveSites('shopping', []);
+    expect(lastSet).toEqual({ sitesByMode: { shopping: [] } });
+  });
+});
+
+// ── loadSelectedMode / saveSelectedMode ───────────────────────
+
+describe('loadSelectedMode', () => {
+  it('returns "bibliography" when key is absent', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({});
+    expect(await loadSelectedMode()).toBe('bibliography');
+  });
+
+  it('returns stored mode when present', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({ selectedMode: 'shopping' });
+    expect(await loadSelectedMode()).toBe('shopping');
+  });
+});
+
+describe('saveSelectedMode', () => {
+  it('writes selectedMode to storage', async () => {
+    await saveSelectedMode('manuscripts');
+    expect(lastSet).toEqual({ selectedMode: 'manuscripts' });
   });
 });
 
 // ── loadSelectedSites ─────────────────────────────────────────
 
 describe('loadSelectedSites', () => {
-  it('returns IDs of all enabled DEFAULT_SITES when key is absent', async () => {
-    mockGet({});
-    const result = await loadSelectedSites();
+  it('returns IDs of all enabled DEFAULT_SITES for bibliography when absent', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({});
+    const result = await loadSelectedSites('bibliography');
     const expected = DEFAULT_SITES.filter(s => s.enabled).map(s => s.id);
     expect(result).toEqual(expected);
   });
 
-  it('returns IDs of all enabled DEFAULT_SITES when selectedSites is empty array', async () => {
-    mockGet({ selectedSites: [] });
-    const result = await loadSelectedSites();
-    const expected = DEFAULT_SITES.filter(s => s.enabled).map(s => s.id);
-    expect(result).toEqual(expected);
+  it('returns [] for images when absent (no default sites for images)', async () => {
+    global.browser.storage.local.get = () => Promise.resolve({});
+    const result = await loadSelectedSites('images');
+    expect(result).toEqual([]);
   });
 
-  it('returns stored selectedSites when present and non-empty', async () => {
-    mockGet({ selectedSites: ['worldcat', 'ixtheo'] });
-    const result = await loadSelectedSites();
+  it('returns stored selectedSites for the mode when present and non-empty', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ selectedSitesByMode: { bibliography: ['worldcat', 'ixtheo'] } });
+    const result = await loadSelectedSites('bibliography');
     expect(result).toEqual(['worldcat', 'ixtheo']);
+  });
+
+  it('uses legacy "selectedSites" for bibliography when selectedSitesByMode is absent', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ selectedSites: ['worldcat'] });
+    const result = await loadSelectedSites('bibliography');
+    expect(result).toEqual(['worldcat']);
   });
 });
 
 // ── saveSelectedSites ─────────────────────────────────────────
 
 describe('saveSelectedSites', () => {
-  it('writes selectedSites to storage', async () => {
-    await saveSelectedSites(['worldcat', 'ixtheo']);
-    expect(lastSet).toEqual({ selectedSites: ['worldcat', 'ixtheo'] });
+  it('merges into selectedSitesByMode and writes to storage', async () => {
+    global.browser.storage.local.get = () =>
+      Promise.resolve({ selectedSitesByMode: { images: ['img1'] } });
+    await saveSelectedSites('bibliography', ['worldcat', 'ixtheo']);
+    expect(lastSet).toEqual({
+      selectedSitesByMode: { images: ['img1'], bibliography: ['worldcat', 'ixtheo'] },
+    });
   });
 });
 
 // ── getDefaultSites ───────────────────────────────────────────
 
 describe('getDefaultSites', () => {
-  it('returns the DEFAULT_SITES constant', () => {
-    expect(getDefaultSites()).toEqual(DEFAULT_SITES);
+  it('returns DEFAULT_SITES for bibliography', () => {
+    expect(getDefaultSites('bibliography')).toEqual(DEFAULT_SITES);
   });
 
-  it('DEFAULT_SITES contains 7 sites', () => {
-    expect(getDefaultSites()).toHaveLength(7);
+  it('returns [] for images (skeleton mode)', () => {
+    expect(getDefaultSites('images')).toEqual([]);
   });
 
-  it('every site has required fields: id, name, searchTemplate containing {query}', () => {
-    for (const site of getDefaultSites()) {
+  it('returns [] for manuscripts (skeleton mode)', () => {
+    expect(getDefaultSites('manuscripts')).toEqual([]);
+  });
+
+  it('returns [] for shopping (skeleton mode)', () => {
+    expect(getDefaultSites('shopping')).toEqual([]);
+  });
+
+  it('bibliography has 7 sites', () => {
+    expect(getDefaultSites('bibliography')).toHaveLength(7);
+  });
+
+  it('every bibliography site has id, name, searchTemplate with {query}', () => {
+    for (const site of getDefaultSites('bibliography')) {
       expect(typeof site.id).toBe('string');
       expect(typeof site.name).toBe('string');
       expect(site.searchTemplate).toContain('{query}');
     }
   });
 });
+

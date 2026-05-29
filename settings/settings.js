@@ -1,10 +1,12 @@
 // Settings page — site management logic
 
-import { loadSites, saveSites, getDefaultSites } from '../storage/storage.js';
+import { loadSites, saveSites, getDefaultSites, loadSelectedMode, saveSelectedMode } from '../storage/storage.js';
 import { buildSearchUrl } from '../utils/urlBuilder.js';
+import { MODES } from '../utils/sites.js';
 
 // ── DOM refs ─────────────────────────────────────────────────
 
+const modeSelect = document.getElementById('mode-select');
 const sitesTbody = document.getElementById('sites-tbody');
 const addBtn = document.getElementById('add-btn');
 const exportBtn = document.getElementById('export-btn');
@@ -22,11 +24,31 @@ const formCancel = document.getElementById('form-cancel');
 const testBtn = document.getElementById('test-btn');
 
 let sites = [];
+let currentMode = 'bibliography';
 
 // ── Init ──────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
-  sites = await loadSites();
+  // Populate mode dropdown
+  MODES.forEach(mode => {
+    const option = document.createElement('option');
+    option.value = mode.id;
+    option.textContent = mode.name;
+    modeSelect.appendChild(option);
+  });
+
+  currentMode = await loadSelectedMode();
+  modeSelect.value = currentMode;
+
+  sites = await loadSites(currentMode);
+  renderSiteList();
+});
+
+modeSelect.addEventListener('change', async () => {
+  currentMode = modeSelect.value;
+  await saveSelectedMode(currentMode);
+  sites = await loadSites(currentMode);
+  siteForm.hidden = true;
   renderSiteList();
 });
 
@@ -290,7 +312,7 @@ importFile.addEventListener('change', async () => {
 
 resetBtn.addEventListener('click', async () => {
   if (!confirm('Reset all sites to defaults? This cannot be undone.')) return;
-  sites = getDefaultSites().map((s, i) => ({ ...s, order: i }));
+  sites = getDefaultSites(currentMode).map((s, i) => ({ ...s, order: i }));
   persist();
   renderSiteList();
   showStatus('Reset to defaults.', 'success');
@@ -299,7 +321,7 @@ resetBtn.addEventListener('click', async () => {
 // ── Helpers ───────────────────────────────────────────────────
 
 async function persist() {
-  await saveSites(sites);
+  await saveSites(currentMode, sites);
 }
 
 let statusTimer;

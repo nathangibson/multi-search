@@ -5,7 +5,7 @@ Unit tests for the two fully testable pure/storage modules. DOM-heavy `settings.
 
 ## Test files
 - `tests/urlBuilder.test.js` — 10 tests for `buildSearchUrl()`
-- `tests/storage.test.js` — 13 tests for `loadSites`, `saveSites`, `loadSelectedSites`, `saveSelectedSites`, `getDefaultSites`
+- `tests/storage.test.js` — 22 tests for `loadSites`, `saveSites`, `loadSelectedSites`, `saveSelectedSites`, `loadSelectedMode`, `saveSelectedMode`, `getDefaultSites` (all mode-aware)
 - `tests/setup.js` — global `browser.storage.local` stub (plain functions, overridden per-test)
 
 ## Running tests

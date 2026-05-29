@@ -33,3 +33,8 @@ Provides a full settings page for managing bibliography search sites: add, edit,
 ## Reordering
 - Up/Down buttons swap adjacent array entries; `order` values normalized to array index on each render
 - Buttons disabled at list boundaries
+
+## Mode awareness
+- All CRUD, import, export, and reset operate on `currentMode` only
+- Mode selector at top of settings page; change reloads sites and hides open form
+- `currentMode` synced to storage via `saveSelectedMode` on change

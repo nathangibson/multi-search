@@ -1,5 +1,9 @@
-// Default site configurations for Phase 1 MVP
-// These sites are hardcoded and cannot be modified by the user in Phase 1
+export const MODES = [
+  { id: 'bibliography', name: 'Bibliography' },
+  { id: 'images',       name: 'Images' },
+  { id: 'manuscripts',  name: 'Manuscripts' },
+  { id: 'shopping',     name: 'Shopping' },
+];
 
 export const DEFAULT_SITES = [
   {
@@ -59,3 +63,11 @@ export const DEFAULT_SITES = [
     order: 6
   }
 ];
+
+
+export const DEFAULT_SITES_BY_MODE = {
+  bibliography: DEFAULT_SITES,
+  images:       [],
+  manuscripts:  [],
+  shopping:     [],
+};

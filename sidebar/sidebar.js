@@ -1,20 +1,45 @@
 // Sidebar script — search UI logic
 
 import { buildSearchUrl } from '../utils/urlBuilder.js';
-import { loadSites, loadSelectedSites, saveSelectedSites } from '../storage/storage.js';
+import { loadSites, loadSelectedSites, saveSelectedSites, loadSelectedMode, saveSelectedMode } from '../storage/storage.js';
+import { MODES } from '../utils/sites.js';
 
 let sites = [];
+let currentMode = 'bibliography';
 
+const modeSelect = document.getElementById('mode-select');
 const queryInput = document.getElementById('query-input');
 const sitesList = document.getElementById('sites-list');
 const searchBtn = document.getElementById('search-btn');
 const errorMessage = document.getElementById('error-message');
 
 async function init() {
-  sites = await loadSites();
-  renderSiteCheckboxes(await loadSelectedSites());
+  // Populate mode dropdown
+  MODES.forEach(mode => {
+    const option = document.createElement('option');
+    option.value = mode.id;
+    option.textContent = mode.name;
+    modeSelect.appendChild(option);
+  });
+
+  currentMode = await loadSelectedMode();
+  modeSelect.value = currentMode;
+
+  await loadModeData();
   queryInput.focus();
 }
+
+async function loadModeData() {
+  sites = await loadSites(currentMode);
+  renderSiteCheckboxes(await loadSelectedSites(currentMode));
+}
+
+modeSelect.addEventListener('change', async () => {
+  currentMode = modeSelect.value;
+  await saveSelectedMode(currentMode);
+  await loadModeData();
+  clearError();
+});
 
 function renderSiteCheckboxes(selectedIds) {
   sitesList.innerHTML = '';
@@ -44,7 +69,7 @@ function renderSiteCheckboxes(selectedIds) {
 
 async function onSelectionChange() {
   const selectedIds = getCheckedSiteIds();
-  await saveSelectedSites(selectedIds);
+  await saveSelectedSites(currentMode, selectedIds);
   clearError();
 }
 
