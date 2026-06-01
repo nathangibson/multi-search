@@ -9,6 +9,7 @@ const STORAGE_KEYS = {
   SELECTED_MODE:          'selectedMode',
   SELECTED_SITES_BY_MODE: 'selectedSitesByMode',
   CUSTOM_MODES:           'customModes',
+  GROUPS_BY_MODE:         'groupsByMode',
   // Legacy keys (pre-modes) — read-only for migration
   LEGACY_SITES:           'sites',
   LEGACY_SELECTED_SITES:  'selectedSites',
@@ -64,21 +65,48 @@ export async function deleteMode(modeId) {
       STORAGE_KEYS.CUSTOM_MODES,
       STORAGE_KEYS.SITES_BY_MODE,
       STORAGE_KEYS.SELECTED_SITES_BY_MODE,
+      STORAGE_KEYS.GROUPS_BY_MODE,
     ]);
     const modes = (result.customModes ?? DEFAULT_MODES).filter(m => m.id !== modeId);
     const sitesByMode = result.sitesByMode ?? {};
     const selectedSitesByMode = result.selectedSitesByMode ?? {};
+    const groupsByMode = result.groupsByMode ?? {};
     delete sitesByMode[modeId];
     delete selectedSitesByMode[modeId];
+    delete groupsByMode[modeId];
     await browser.storage.local.set({
       [STORAGE_KEYS.CUSTOM_MODES]: modes,
       [STORAGE_KEYS.SITES_BY_MODE]: sitesByMode,
       [STORAGE_KEYS.SELECTED_SITES_BY_MODE]: selectedSitesByMode,
+      [STORAGE_KEYS.GROUPS_BY_MODE]: groupsByMode,
     });
     return modes;
   } catch (error) {
     console.error('Failed to delete mode:', error);
     return null;
+  }
+}
+
+// ── Groups (per mode) ─────────────────────────────────────────
+
+export async function loadGroups(modeId) {
+  try {
+    const result = await browser.storage.local.get(STORAGE_KEYS.GROUPS_BY_MODE);
+    return result.groupsByMode?.[modeId] ?? [];
+  } catch (error) {
+    console.error('Failed to load groups:', error);
+    return [];
+  }
+}
+
+export async function saveGroups(modeId, groups) {
+  try {
+    const result = await browser.storage.local.get(STORAGE_KEYS.GROUPS_BY_MODE);
+    const groupsByMode = result.groupsByMode ?? {};
+    groupsByMode[modeId] = groups;
+    await browser.storage.local.set({ [STORAGE_KEYS.GROUPS_BY_MODE]: groupsByMode });
+  } catch (error) {
+    console.error('Failed to save groups:', error);
   }
 }
 

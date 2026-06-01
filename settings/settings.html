@@ -62,6 +62,41 @@
 
     <input type="file" id="import-file" accept=".json" hidden>
 
+    <section class="groups-section">
+      <h2>Groups</h2>
+      <p class="section-hint">Groups let you select multiple sites at once in the sidebar. Sites can belong to more than one group.</p>
+      <table id="groups-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Sites</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="groups-tbody"></tbody>
+      </table>
+      <div class="toolbar">
+        <button id="add-group-btn" class="btn btn-primary">Add Group</button>
+      </div>
+    </section>
+
+    <section id="group-form" hidden>
+      <h2 id="group-form-title">Add Group</h2>
+      <form>
+        <label for="group-form-name">Group Name</label>
+        <input id="group-form-name" type="text" placeholder="e.g. German Resources" required>
+        <input id="group-form-id" type="hidden">
+
+        <label>Sites in this group</label>
+        <div id="group-form-sites" class="group-sites-picker"></div>
+
+        <div class="form-actions">
+          <button id="group-form-save" type="button" class="btn btn-primary">Save</button>
+          <button id="group-form-cancel" type="button" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
+
     <section id="site-form" hidden>
       <h2>Add / Edit Site</h2>
       <form>

@@ -1,6 +1,6 @@
 // Settings page — site management logic
 
-import { loadSites, saveSites, getDefaultSites, loadSelectedMode, saveSelectedMode, loadModes, saveModes, deleteMode } from '../storage/storage.js';
+import { loadSites, saveSites, getDefaultSites, loadSelectedMode, saveSelectedMode, loadModes, saveModes, deleteMode, loadGroups, saveGroups } from '../storage/storage.js';
 import { buildSearchUrl } from '../utils/urlBuilder.js';
 
 // ── DOM refs ─────────────────────────────────────────────────
@@ -32,9 +32,20 @@ const formSave = document.getElementById('form-save');
 const formCancel = document.getElementById('form-cancel');
 const testBtn = document.getElementById('test-btn');
 
+const groupsTbody = document.getElementById('groups-tbody');
+const addGroupBtn = document.getElementById('add-group-btn');
+const groupForm = document.getElementById('group-form');
+const groupFormTitle = document.getElementById('group-form-title');
+const groupFormName = document.getElementById('group-form-name');
+const groupFormId = document.getElementById('group-form-id');
+const groupFormSites = document.getElementById('group-form-sites');
+const groupFormSave = document.getElementById('group-form-save');
+const groupFormCancel = document.getElementById('group-form-cancel');
+
 let sites = [];
 let currentMode = 'bibliography';
 let modes = [];
+let groups = [];
 
 // ── Init ──────────────────────────────────────────────────────
 
@@ -50,16 +61,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderModeSelect();
 
   sites = await loadSites(currentMode);
+  groups = await loadGroups(currentMode);
   renderSiteList();
+  renderGroupList();
 });
 
 modeSelect.addEventListener('change', async () => {
   currentMode = modeSelect.value;
   await saveSelectedMode(currentMode);
   sites = await loadSites(currentMode);
+  groups = await loadGroups(currentMode);
   siteForm.hidden = true;
   modeForm.hidden = true;
+  groupForm.hidden = true;
   renderSiteList();
+  renderGroupList();
 });
 
 // ── Mode management ───────────────────────────────────────────
@@ -158,6 +174,147 @@ modeFormSave.addEventListener('click', async () => {
 modeFormCancel.addEventListener('click', () => {
   modeForm.hidden = true;
 });
+
+// ── Group management ──────────────────────────────────────────
+
+function renderGroupList() {
+  groupsTbody.innerHTML = '';
+
+  if (groups.length === 0) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 3;
+    td.textContent = 'No groups configured.';
+    td.className = 'empty';
+    tr.appendChild(td);
+    groupsTbody.appendChild(tr);
+    return;
+  }
+
+  groups.forEach((group, index) => {
+    const tr = document.createElement('tr');
+
+    const tdName = document.createElement('td');
+    tdName.textContent = group.name;
+
+    const tdSites = document.createElement('td');
+    tdSites.className = 'group-sites-cell';
+    const memberNames = group.siteIds
+      .map(id => sites.find(s => s.id === id)?.name)
+      .filter(Boolean);
+    tdSites.textContent = memberNames.length
+      ? `${memberNames.length}: ${memberNames.join(', ')}`
+      : 'No sites';
+    tdSites.title = memberNames.join(', ');
+
+    const tdActions = document.createElement('td');
+    tdActions.className = 'actions-cell';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.className = 'btn btn-secondary';
+    editBtn.addEventListener('click', () => openEditGroupForm(index));
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.className = 'btn btn-danger';
+    deleteBtn.addEventListener('click', () => deleteGroup(index));
+
+    tdActions.appendChild(editBtn);
+    tdActions.appendChild(deleteBtn);
+    tr.append(tdName, tdSites, tdActions);
+    groupsTbody.appendChild(tr);
+  });
+}
+
+addGroupBtn.addEventListener('click', () => {
+  groupFormTitle.textContent = 'Add Group';
+  groupFormName.value = '';
+  groupFormId.value = '';
+  renderGroupFormSites([]);
+  groupForm.hidden = false;
+  groupFormName.focus();
+});
+
+function openEditGroupForm(index) {
+  const group = groups[index];
+  groupFormTitle.textContent = 'Edit Group';
+  groupFormName.value = group.name;
+  groupFormId.value = group.id;
+  renderGroupFormSites(group.siteIds);
+  groupForm.hidden = false;
+  groupFormName.focus();
+}
+
+function renderGroupFormSites(selectedSiteIds) {
+  groupFormSites.innerHTML = '';
+  const enabledSites = sites.filter(s => s.enabled).sort((a, b) => a.order - b.order);
+
+  if (enabledSites.length === 0) {
+    const p = document.createElement('p');
+    p.textContent = 'No enabled sites available.';
+    p.className = 'group-sites-empty';
+    groupFormSites.appendChild(p);
+    return;
+  }
+
+  enabledSites.forEach(site => {
+    const label = document.createElement('label');
+    label.className = 'group-site-option';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = site.id;
+    cb.checked = selectedSiteIds.includes(site.id);
+
+    label.appendChild(cb);
+    label.append(` ${site.name}`);
+    groupFormSites.appendChild(label);
+  });
+}
+
+groupFormSave.addEventListener('click', async () => {
+  const name = groupFormName.value.trim();
+  if (!name) {
+    showStatus('Group name is required.', 'error');
+    groupFormName.focus();
+    return;
+  }
+
+  const siteIds = Array.from(groupFormSites.querySelectorAll('input[type="checkbox"]:checked'))
+    .map(cb => cb.value);
+
+  const id = groupFormId.value;
+  if (id) {
+    const group = groups.find(g => g.id === id);
+    if (group) {
+      group.name = name;
+      group.siteIds = siteIds;
+    }
+  } else {
+    let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (!slug) slug = `group-${Date.now()}`;
+    if (groups.some(g => g.id === slug)) slug = `${slug}-${Date.now()}`;
+    groups.push({ id: slug, name, siteIds });
+  }
+
+  await saveGroups(currentMode, groups);
+  renderGroupList();
+  groupForm.hidden = true;
+  showStatus(id ? 'Group saved.' : 'Group added.', 'success');
+});
+
+groupFormCancel.addEventListener('click', () => {
+  groupForm.hidden = true;
+});
+
+function deleteGroup(index) {
+  const name = groups[index].name;
+  groups.splice(index, 1);
+  saveGroups(currentMode, groups);
+  renderGroupList();
+  showStatus(`Group "${name}" deleted.`, 'success');
+}
 
 // ── Render ────────────────────────────────────────────────────
 

@@ -279,7 +279,87 @@ td .empty {
   margin-top: 18px;
 }
 
-input[type="checkbox"] {
+/* ── Groups section ──────────────────────────────────────────── */
+
+.groups-section {
+  margin-top: 32px;
+}
+
+.section-hint {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.group-sites-cell {
+  font-size: 12px;
+  color: #555;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Group form ──────────────────────────────────────────────── */
+
+#group-form {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-top: 8px;
+  background: #fafafa;
+}
+
+#group-form label:not(.group-site-option) {
+  display: block;
+  font-weight: 500;
+  margin-top: 14px;
+  margin-bottom: 5px;
+}
+
+#group-form label:first-of-type {
+  margin-top: 0;
+}
+
+#group-form input[type="text"] {
+  width: 100%;
+  max-width: 360px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#group-form input[type="text"]:focus {
+  outline: none;
+  border-color: #4A90E2;
+  box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+}
+
+.group-sites-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 4px;
+}
+
+.group-site-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: normal !important;
+  margin-top: 0 !important;
+}
+
+.group-sites-empty {
+  font-size: 13px;
+  color: #888;
+  font-style: italic;
+}
+
+
   width: 15px;
   height: 15px;
   accent-color: #4A90E2;
