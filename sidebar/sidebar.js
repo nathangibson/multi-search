@@ -1,8 +1,7 @@
 // Sidebar script — search UI logic
 
 import { buildSearchUrl } from '../utils/urlBuilder.js';
-import { loadSites, loadSelectedSites, saveSelectedSites, loadSelectedMode, saveSelectedMode, loadLastQuery, saveLastQuery } from '../storage/storage.js';
-import { MODES } from '../utils/sites.js';
+import { loadSites, loadSelectedSites, saveSelectedSites, loadSelectedMode, saveSelectedMode, loadLastQuery, saveLastQuery, loadModes } from '../storage/storage.js';
 
 let sites = [];
 let currentMode = 'bibliography';
@@ -15,7 +14,8 @@ const errorMessage = document.getElementById('error-message');
 
 async function init() {
   // Populate mode dropdown
-  MODES.forEach(mode => {
+  const modes = await loadModes();
+  modes.forEach(mode => {
     const option = document.createElement('option');
     option.value = mode.id;
     option.textContent = mode.name;

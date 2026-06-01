@@ -1,13 +1,14 @@
 // Storage abstraction layer
 // Handles persistence of user preferences using browser.storage.local
 
-import { DEFAULT_SITES, DEFAULT_SITES_BY_MODE } from '../utils/sites.js';
+import { DEFAULT_SITES, DEFAULT_SITES_BY_MODE, MODES as DEFAULT_MODES } from '../utils/sites.js';
 
 const STORAGE_KEYS = {
   LAST_QUERY_BY_MODE:     'lastQueryByMode',
   SITES_BY_MODE:          'sitesByMode',
   SELECTED_MODE:          'selectedMode',
   SELECTED_SITES_BY_MODE: 'selectedSitesByMode',
+  CUSTOM_MODES:           'customModes',
   // Legacy keys (pre-modes) — read-only for migration
   LEGACY_SITES:           'sites',
   LEGACY_SELECTED_SITES:  'selectedSites',
@@ -33,6 +34,51 @@ export async function saveLastQuery(modeId, query) {
     await browser.storage.local.set({ [STORAGE_KEYS.LAST_QUERY_BY_MODE]: lastQueryByMode });
   } catch (error) {
     console.error('Failed to save last query:', error);
+  }
+}
+
+// ── Custom modes ──────────────────────────────────────────────
+
+export async function loadModes() {
+  try {
+    const result = await browser.storage.local.get(STORAGE_KEYS.CUSTOM_MODES);
+    return result.customModes ?? DEFAULT_MODES;
+  } catch (error) {
+    console.error('Failed to load modes:', error);
+    return DEFAULT_MODES;
+  }
+}
+
+export async function saveModes(modes) {
+  try {
+    await browser.storage.local.set({ [STORAGE_KEYS.CUSTOM_MODES]: modes });
+  } catch (error) {
+    console.error('Failed to save modes:', error);
+  }
+}
+
+export async function deleteMode(modeId) {
+  try {
+    // Remove mode from the modes list
+    const result = await browser.storage.local.get([
+      STORAGE_KEYS.CUSTOM_MODES,
+      STORAGE_KEYS.SITES_BY_MODE,
+      STORAGE_KEYS.SELECTED_SITES_BY_MODE,
+    ]);
+    const modes = (result.customModes ?? DEFAULT_MODES).filter(m => m.id !== modeId);
+    const sitesByMode = result.sitesByMode ?? {};
+    const selectedSitesByMode = result.selectedSitesByMode ?? {};
+    delete sitesByMode[modeId];
+    delete selectedSitesByMode[modeId];
+    await browser.storage.local.set({
+      [STORAGE_KEYS.CUSTOM_MODES]: modes,
+      [STORAGE_KEYS.SITES_BY_MODE]: sitesByMode,
+      [STORAGE_KEYS.SELECTED_SITES_BY_MODE]: selectedSitesByMode,
+    });
+    return modes;
+  } catch (error) {
+    console.error('Failed to delete mode:', error);
+    return null;
   }
 }
 

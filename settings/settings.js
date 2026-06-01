@@ -1,12 +1,21 @@
 // Settings page — site management logic
 
-import { loadSites, saveSites, getDefaultSites, loadSelectedMode, saveSelectedMode } from '../storage/storage.js';
+import { loadSites, saveSites, getDefaultSites, loadSelectedMode, saveSelectedMode, loadModes, saveModes, deleteMode } from '../storage/storage.js';
 import { buildSearchUrl } from '../utils/urlBuilder.js';
-import { MODES } from '../utils/sites.js';
 
 // ── DOM refs ─────────────────────────────────────────────────
 
 const modeSelect = document.getElementById('mode-select');
+const addModeBtn = document.getElementById('add-mode-btn');
+const renameModeBtn = document.getElementById('rename-mode-btn');
+const deleteModeBtn = document.getElementById('delete-mode-btn');
+const modeForm = document.getElementById('mode-form');
+const modeFormTitle = document.getElementById('mode-form-title');
+const modeFormName = document.getElementById('mode-form-name');
+const modeFormId = document.getElementById('mode-form-id');
+const modeFormSave = document.getElementById('mode-form-save');
+const modeFormCancel = document.getElementById('mode-form-cancel');
+
 const sitesTbody = document.getElementById('sites-tbody');
 const addBtn = document.getElementById('add-btn');
 const exportBtn = document.getElementById('export-btn');
@@ -25,20 +34,20 @@ const testBtn = document.getElementById('test-btn');
 
 let sites = [];
 let currentMode = 'bibliography';
+let modes = [];
 
 // ── Init ──────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Populate mode dropdown
-  MODES.forEach(mode => {
-    const option = document.createElement('option');
-    option.value = mode.id;
-    option.textContent = mode.name;
-    modeSelect.appendChild(option);
-  });
-
+  modes = await loadModes();
   currentMode = await loadSelectedMode();
-  modeSelect.value = currentMode;
+
+  // Ensure selectedMode is valid; fall back to first mode
+  if (!modes.find(m => m.id === currentMode)) {
+    currentMode = modes[0]?.id ?? 'bibliography';
+  }
+
+  renderModeSelect();
 
   sites = await loadSites(currentMode);
   renderSiteList();
@@ -49,7 +58,105 @@ modeSelect.addEventListener('change', async () => {
   await saveSelectedMode(currentMode);
   sites = await loadSites(currentMode);
   siteForm.hidden = true;
+  modeForm.hidden = true;
   renderSiteList();
+});
+
+// ── Mode management ───────────────────────────────────────────
+
+function renderModeSelect() {
+  modeSelect.innerHTML = '';
+  modes.forEach(mode => {
+    const option = document.createElement('option');
+    option.value = mode.id;
+    option.textContent = mode.name;
+    modeSelect.appendChild(option);
+  });
+  modeSelect.value = currentMode;
+  deleteModeBtn.disabled = modes.length <= 1;
+}
+
+addModeBtn.addEventListener('click', () => {
+  modeFormTitle.textContent = 'Add Mode';
+  modeFormName.value = '';
+  modeFormId.value = '';
+  modeForm.hidden = false;
+  modeFormName.focus();
+});
+
+renameModeBtn.addEventListener('click', () => {
+  const mode = modes.find(m => m.id === currentMode);
+  if (!mode) return;
+  modeFormTitle.textContent = 'Rename Mode';
+  modeFormName.value = mode.name;
+  modeFormId.value = mode.id;
+  modeForm.hidden = false;
+  modeFormName.focus();
+});
+
+deleteModeBtn.addEventListener('click', async () => {
+  if (modes.length <= 1) {
+    showStatus('Cannot delete the last mode.', 'error');
+    return;
+  }
+  const mode = modes.find(m => m.id === currentMode);
+  if (!mode) return;
+  const confirmed = confirm(
+    `Delete mode "${mode.name}"?\n\nThis will permanently remove all search site configurations for this mode. This cannot be undone.`
+  );
+  if (!confirmed) return;
+
+  const updated = await deleteMode(currentMode);
+  if (!updated) {
+    showStatus('Failed to delete mode.', 'error');
+    return;
+  }
+  modes = updated;
+  currentMode = modes[0].id;
+  await saveSelectedMode(currentMode);
+  renderModeSelect();
+  sites = await loadSites(currentMode);
+  siteForm.hidden = true;
+  modeForm.hidden = true;
+  renderSiteList();
+  showStatus(`Mode "${mode.name}" deleted.`, 'success');
+});
+
+modeFormSave.addEventListener('click', async () => {
+  const name = modeFormName.value.trim();
+  if (!name) {
+    showStatus('Mode name is required.', 'error');
+    modeFormName.focus();
+    return;
+  }
+
+  const id = modeFormId.value;
+  if (id) {
+    // Rename existing mode
+    const mode = modes.find(m => m.id === id);
+    if (mode) mode.name = name;
+  } else {
+    // Add new mode — generate slug ID, ensure uniqueness
+    let slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (!slug) slug = `mode-${Date.now()}`;
+    if (modes.some(m => m.id === slug)) slug = `${slug}-${Date.now()}`;
+    modes.push({ id: slug, name });
+    currentMode = slug;
+  }
+
+  await saveModes(modes);
+  await saveSelectedMode(currentMode);
+  renderModeSelect();
+  if (!id) {
+    sites = await loadSites(currentMode);
+    renderSiteList();
+  }
+  modeForm.hidden = true;
+  showStatus(id ? 'Mode renamed.' : 'Mode added.', 'success');
+});
+
+modeFormCancel.addEventListener('click', () => {
+  modeForm.hidden = true;
 });
 
 // ── Render ────────────────────────────────────────────────────

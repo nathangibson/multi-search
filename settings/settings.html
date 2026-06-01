@@ -17,6 +17,24 @@
       <select id="mode-select">
         <!-- Populated by settings.js -->
       </select>
+      <div class="mode-actions">
+        <button id="add-mode-btn" class="btn btn-secondary">+ Add Mode</button>
+        <button id="rename-mode-btn" class="btn btn-secondary">Rename</button>
+        <button id="delete-mode-btn" class="btn btn-danger">Delete Mode</button>
+      </div>
+    </section>
+
+    <section id="mode-form" hidden>
+      <h2 id="mode-form-title">Add Mode</h2>
+      <form>
+        <label for="mode-form-name">Mode Name</label>
+        <input id="mode-form-name" type="text" placeholder="e.g. News" required>
+        <input id="mode-form-id" type="hidden">
+        <div class="form-actions">
+          <button id="mode-form-save" type="button" class="btn btn-primary">Save</button>
+          <button id="mode-form-cancel" type="button" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
     </section>
 
     <section>
