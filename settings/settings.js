@@ -508,12 +508,13 @@ testBtn.addEventListener('click', () => {
 // ── Export ────────────────────────────────────────────────────
 
 exportBtn.addEventListener('click', () => {
-  const json = JSON.stringify(sites, null, 2);
+  const payload = { sites, groups };
+  const json = JSON.stringify(payload, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'bibliography-sites.json';
+  a.download = 'multi-search-config.json';
   a.click();
   URL.revokeObjectURL(url);
   showStatus('Exported.', 'success');
@@ -535,28 +536,29 @@ importFile.addEventListener('change', async () => {
     return;
   }
 
-  if (!Array.isArray(parsed)) {
-    showStatus('JSON must be an array of site objects.', 'error');
+  // Support legacy format (bare array of sites) and new format ({ sites, groups })
+  const rawSites = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.sites) ? parsed.sites : null);
+  if (!rawSites) {
+    showStatus('JSON must be a sites array or { sites, groups } object.', 'error');
     return;
   }
 
-  // Validate each entry
-  const valid = parsed.filter(s =>
+  // Validate sites
+  const validSites = rawSites.filter(s =>
     s && typeof s.id === 'string' && s.id &&
     typeof s.name === 'string' && s.name &&
     typeof s.searchTemplate === 'string' && s.searchTemplate.includes('{query}')
   );
 
-  if (valid.length === 0) {
+  if (validSites.length === 0) {
     showStatus('No valid sites found in file.', 'error');
     return;
   }
 
-  // Upsert: update matching IDs, append new ones
-  valid.forEach(incoming => {
+  // Upsert sites: update matching IDs, append new ones
+  validSites.forEach(incoming => {
     const existing = sites.find(s => s.id === incoming.id);
     if (existing) {
-      // Preserve existing order; only update name/template/enabled/baseUrl
       existing.name = incoming.name;
       existing.searchTemplate = incoming.searchTemplate;
       if (incoming.baseUrl) existing.baseUrl = incoming.baseUrl;
@@ -566,9 +568,34 @@ importFile.addEventListener('change', async () => {
     }
   });
 
+  // Upsert groups (only in new format)
+  let importedGroupCount = 0;
+  if (!Array.isArray(parsed) && Array.isArray(parsed?.groups)) {
+    const validGroups = parsed.groups.filter(g =>
+      g && typeof g.id === 'string' && g.id &&
+      typeof g.name === 'string' && g.name &&
+      Array.isArray(g.siteIds)
+    );
+    validGroups.forEach(incoming => {
+      const existing = groups.find(g => g.id === incoming.id);
+      if (existing) {
+        existing.name = incoming.name;
+        existing.siteIds = incoming.siteIds;
+      } else {
+        groups.push({ id: incoming.id, name: incoming.name, siteIds: incoming.siteIds });
+      }
+    });
+    importedGroupCount = validGroups.length;
+    await saveGroups(currentMode, groups);
+    renderGroupList();
+  }
+
   persist();
   renderSiteList();
-  showStatus(`Imported ${valid.length} site(s).`, 'success');
+  const msg = importedGroupCount
+    ? `Imported ${validSites.length} site(s) and ${importedGroupCount} group(s).`
+    : `Imported ${validSites.length} site(s).`;
+  showStatus(msg, 'success');
   importFile.value = '';
 });
 
