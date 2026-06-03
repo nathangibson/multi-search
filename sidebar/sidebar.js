@@ -226,7 +226,7 @@ async function handleSearch() {
   }
 
   try {
-    await browser.runtime.sendMessage({ type: 'OPEN_SEARCH_TABS', urls });
+    await browser.runtime.sendMessage({ type: 'OPEN_SEARCH_TABS', urls, query: query.trim() });
   } catch (error) {
     console.error('Failed to send search message:', error);
     showError('Could not open search tabs. Please try again.');

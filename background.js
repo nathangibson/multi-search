@@ -3,7 +3,7 @@
 
 browser.runtime.onMessage.addListener((message, sender) => {
   if (message.type === 'OPEN_SEARCH_TABS') {
-    return openSearchTabs(message.urls);
+    return openSearchTabs(message.urls, message.query);
   }
 });
 
@@ -11,8 +11,9 @@ browser.runtime.onMessage.addListener((message, sender) => {
  * Opens each search URL as a new tab in the current window,
  * then groups them together using the Firefox tab groups API.
  * @param {string[]} urls - Array of fully-constructed search URLs
+ * @param {string} [query] - The search query used to name the tab group
  */
-async function openSearchTabs(urls) {
+async function openSearchTabs(urls, query) {
   if (!urls || urls.length === 0) return;
 
   try {
@@ -23,8 +24,11 @@ async function openSearchTabs(urls) {
 
     const tabIds = tabs.map(tab => tab.id);
 
-    // Group the tabs together and focus the first one
-    await browser.tabs.group({ tabIds });
+    // Group the tabs and name the group after the search query
+    const groupId = await browser.tabs.group({ tabIds });
+    if (query && browser.tabGroups) {
+      await browser.tabGroups.update(groupId, { title: query });
+    }
     await browser.tabs.update(tabIds[0], { active: true });
   } catch (error) {
     console.error('Failed to open search tabs:', error);
