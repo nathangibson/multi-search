@@ -6,7 +6,7 @@ A Firefox extension that adds a persistent sidebar panel for searching across mu
 
 ## Overview
 
-Multi-Site Search provides a dedicated sidebar panel with four independent search modes — **Bibliography**, **Images**, **Manuscripts**, and **Shopping** — each with its own set of sites and remembered state. You can:
+Multi-Search provides a dedicated sidebar panel with four independent search modes — **Bibliography**, **Images**, **Manuscripts**, and **Shopping** — each with its own set of sites and remembered state. You can:
 
 - Switch between modes using a dropdown (state is saved per mode)
 - Enter a query once; the last query per mode is pre-filled on next open

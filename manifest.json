@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Multi-Site Bibliography Search",
+  "name": "Multi-Search",
   "version": "1.0.0",
   "description": "Search multiple bibliography sites simultaneously from a single interface.",
 
@@ -11,7 +11,7 @@
   },
 
   "sidebar_action": {
-    "default_title": "Multi-Site Bibliography Search",
+    "default_title": "Multi-Search",
     "default_panel": "sidebar/sidebar.html",
     "default_icon": {
       "16": "icons/icon-16.png",

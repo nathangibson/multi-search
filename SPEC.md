@@ -1,4 +1,4 @@
-# Multi-Site Bibliography Search - Firefox Extension Specification
+# Multi-Search - Firefox Extension Specification
 
 ## Overview
 A Firefox extension that enables simultaneous searching across multiple bibliography/library websites from a single interface. Users enter a search query once, select which sites to search via checkboxes, and the extension opens all selected searches in a tab group.
