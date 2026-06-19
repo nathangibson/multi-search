@@ -1,0 +1,122 @@
+{
+  "modeId": "images",
+  "modeName": "Images",
+  "sites": [
+    {
+      "id": "google-images-creative-commons",
+      "name": "Google Images Creative Commons",
+      "baseUrl": "",
+      "searchTemplate": "https://www.google.com/search?q={query}&sca_esv=f3003becd8d45770&udm=2&source=lnt&tbs=sur:cl&sa=X&ved=2ahUKEwjD3ZjX5t2UAxVe0QIHHffdFNMQpwV6BAgGEB0&biw=1139&bih=881&dpr=2",
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "id": "unsplash",
+      "name": "Unsplash",
+      "baseUrl": "",
+      "searchTemplate": "https://unsplash.com/s/photos/{query}",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "pixabay",
+      "name": "Pixabay",
+      "baseUrl": "",
+      "searchTemplate": "https://pixabay.com/images/search/{query}/",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "wikimedia-commons",
+      "name": "Wikimedia Commons",
+      "baseUrl": "",
+      "searchTemplate": "https://commons.wikimedia.org/w/index.php?search={query}",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "flickr-creative-commons",
+      "name": "Flickr Creative Commons",
+      "baseUrl": "",
+      "searchTemplate": "https://www.flickr.com/search/?text={query}&license=1%2C2%2C3%2C4%2C5%2C6%2C9%2C11%2C12%2C13%2C14%2C15%2C16",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "id": "duckduckgo-creative-commons",
+      "name": "DuckDuckGo Creative Commons",
+      "baseUrl": "",
+      "searchTemplate": "https://duckduckgo.com/?q={query}&ia=images&iax=images&iaf=license%3AAny",
+      "enabled": true,
+      "order": 5
+    },
+    {
+      "id": "openverse",
+      "name": "Openverse",
+      "baseUrl": "",
+      "searchTemplate": "https://openverse.org/search/?q={query}&license_type=commercial,modification",
+      "enabled": true,
+      "order": 6
+    },
+    {
+      "id": "open-clip-art",
+      "name": "Open Clip Art",
+      "baseUrl": "",
+      "searchTemplate": "https://openclipart.org/search/?query={query}",
+      "enabled": true,
+      "order": 7
+    },
+    {
+      "id": "clker",
+      "name": "Clker",
+      "baseUrl": "",
+      "searchTemplate": "http://www.clker.com/search/{query}/1",
+      "enabled": true,
+      "order": 8
+    }
+  ],
+  "groups": [
+    {
+      "id": "creative-commons",
+      "name": "Creative Commons",
+      "siteIds": [
+        "google-images-creative-commons",
+        "wikimedia-commons",
+        "flickr-creative-commons",
+        "duckduckgo-creative-commons",
+        "openverse"
+      ]
+    },
+    {
+      "id": "free-license",
+      "name": "Free license",
+      "siteIds": [
+        "unsplash",
+        "pixabay",
+        "open-clip-art",
+        "clker"
+      ]
+    },
+    {
+      "id": "photos",
+      "name": "Photos",
+      "siteIds": [
+        "google-images-creative-commons",
+        "unsplash",
+        "pixabay",
+        "wikimedia-commons",
+        "flickr-creative-commons",
+        "duckduckgo-creative-commons",
+        "openverse"
+      ]
+    },
+    {
+      "id": "clip-art",
+      "name": "Clip art",
+      "siteIds": [
+        "open-clip-art",
+        "clker"
+      ]
+    }
+  ]
+}

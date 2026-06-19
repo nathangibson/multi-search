@@ -1,0 +1,47 @@
+{
+  "modeId": "art-objects",
+  "modeName": "Art & Objects",
+  "sites": [
+    {
+      "id": "europeana",
+      "name": "Europeana",
+      "baseUrl": "",
+      "searchTemplate": "https://www.europeana.eu/en/search?page=1&view=grid&query={query}",
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "id": "british-museum",
+      "name": "British Museum",
+      "baseUrl": "",
+      "searchTemplate": "https://www.britishmuseum.org/collection/search?keyword={query}",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "wikimedia-commons",
+      "name": "Wikimedia Commons",
+      "baseUrl": "",
+      "searchTemplate": "https://commons.wikimedia.org/w/index.php?search={query}",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "metropolitan-museum",
+      "name": "Metropolitan Museum",
+      "baseUrl": "",
+      "searchTemplate": "https://www.metmuseum.org/art/collection/search?q={query}",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "israel-museum",
+      "name": "Israel Museum",
+      "baseUrl": "",
+      "searchTemplate": "https://duckduckgo.com/?t=ffab&q={query}+site%3Ahttps%3A%2F%2Fwww.imj.org.il%2Fen%2Fcollections&ia=web",
+      "enabled": true,
+      "order": 4
+    }
+  ],
+  "groups": []
+}

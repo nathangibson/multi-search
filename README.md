@@ -17,7 +17,9 @@ Multi-Site Search provides a dedicated sidebar panel with four independent searc
 
 ## Installation
 
-Load as a temporary add-on (development):
+### Development (temporary)
+
+Load as a temporary add-on:
 
 1. Open `about:debugging` in Firefox
 2. Click **This Firefox**
@@ -25,6 +27,23 @@ Load as a temporary add-on (development):
 4. Select `manifest.json` from this folder
 
 > No build step required. Reload at `about:debugging` after code changes.
+
+### Persistent Install
+
+Install from the pre-built `.xpi` (persists across browser restarts):
+
+1. Download the latest `.xpi` from the [Releases](https://github.com/youruser/multi-search-plugin/releases) page
+2. Open Firefox → **Add-ons** (`about:addons`)
+3. Click the gear ⚙ → **"Install Add-on From File…"**
+4. Select the `.xpi` file
+
+### Build from source
+
+```bash
+# Requires Node.js (system node at /opt/homebrew/bin/node; /usr/local/bin/node is broken)
+zip -r multi-search-plugin-1.0.0.xpi manifest.json background.js sidebar/ settings/ sites/ storage/ utils/ icons/ \
+  -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*"
+```
 
 ---
 

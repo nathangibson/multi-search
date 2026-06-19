@@ -1,0 +1,23 @@
+{
+  "modeId": "shopping",
+  "modeName": "Shopping",
+  "sites": [
+    {
+      "id": "google-shopping",
+      "name": "Google Shopping",
+      "baseUrl": "",
+      "searchTemplate": "https://www.google.com/search?q={query}&udm=28&source=hp&iflsig=AFdpzrgAAAAAah_A7yO3wvyYpMr09Up9hjb8imYtX_cJ",
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "id": "amazon-de",
+      "name": "Amazon.de",
+      "baseUrl": "",
+      "searchTemplate": "https://www.amazon.de/s?k={query}",
+      "enabled": true,
+      "order": 1
+    }
+  ],
+  "groups": []
+}

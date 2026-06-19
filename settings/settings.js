@@ -19,6 +19,7 @@ const modeFormCancel = document.getElementById('mode-form-cancel');
 const sitesTbody = document.getElementById('sites-tbody');
 const addBtn = document.getElementById('add-btn');
 const exportBtn = document.getElementById('export-btn');
+const exportAllBtn = document.getElementById('export-all-btn');
 const importBtn = document.getElementById('import-btn');
 const importFile = document.getElementById('import-file');
 const resetBtn = document.getElementById('reset-btn');
@@ -518,6 +519,36 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
   showStatus('Exported.', 'success');
+});
+
+exportAllBtn.addEventListener('click', async () => {
+  const allModes = await loadModes();
+  
+  for (const mode of allModes) {
+    const modeSites = await loadSites(mode.id);
+    const modeGroups = await loadGroups(mode.id);
+    
+    const payload = { 
+      modeId: mode.id,
+      modeName: mode.name,
+      sites: modeSites, 
+      groups: modeGroups 
+    };
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const slug = mode.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const filename = (slug || `mode-${mode.id}`) + '.json';
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  
+  showStatus(`Exported ${allModes.length} mode(s).`, 'success');
 });
 
 // ── Import ────────────────────────────────────────────────────

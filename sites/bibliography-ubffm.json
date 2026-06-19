@@ -1,0 +1,60 @@
+{
+  "modeId": "bibliography",
+  "modeName": "Bibliography",
+  "sites": [
+    {
+      "id": "hebis-frankfurt",
+      "name": "HeBIS Frankfurt (UB)",
+      "baseUrl": "https://ubffm.hds.hebis.de/",
+      "searchTemplate": "https://ubffm.hds.hebis.de/Search/Results?lookfor={query}&type=AllFields",
+      "enabled": true,
+      "order": 6
+    },
+    {
+      "id": "dbis-theology-religious-studies-ub-frankfurt",
+      "name": "DBIS Theology & Religious Studies (UB Frankfurt)",
+      "baseUrl": "",
+      "searchTemplate": "https://dbis-ur-de.proxy.ub.uni-frankfurt.de/UBFM/browse/subjects/41/?q={query}&availability-filter-free=on&availability-filter-local=on&filter-publication-date-start=&filter-publication-date-end=&filter-report-date-start=&filter-report-date-end=&filter-entry-date-start=&sort_by=1&ps=25",
+      "enabled": true,
+      "order": 7
+    },
+    {
+      "id": "e-journals-ub-frankfurt",
+      "name": "E-Journals (UB Frankfurt)",
+      "baseUrl": "",
+      "searchTemplate": "https://ezb-ur-de.proxy.ub.uni-frankfurt.de/searchres.phtml?bibid=UBFM&colors=7&lang=en&jq_type1=QS&jq_term1={query}",
+      "enabled": true,
+      "order": 8
+    }
+  ],
+  "groups": [
+    {
+      "id": "digital-access",
+      "name": "Digital access",
+      "siteIds": [
+        "hebis-frankfurt"
+      ]
+    },
+    {
+      "id": "metadata",
+      "name": "Metadata",
+      "siteIds": [
+        "hebis-frankfurt"
+      ]
+    },
+    {
+      "id": "journals",
+      "name": "Journals",
+      "siteIds": [
+        "e-journals-ub-frankfurt"
+      ]
+    },
+    {
+      "id": "databases",
+      "name": "Databases",
+      "siteIds": [
+        "dbis-theology-religious-studies-ub-frankfurt"
+      ]
+    }
+  ]
+}
