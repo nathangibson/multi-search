@@ -1,7 +1,7 @@
 // Storage abstraction layer
 // Handles persistence of user preferences using browser.storage.local
 
-import { DEFAULT_SITES, DEFAULT_SITES_BY_MODE, MODES as DEFAULT_MODES } from '../utils/sites.js';
+import { DEFAULT_SITES, DEFAULT_SITES_BY_MODE, DEFAULT_GROUPS_BY_MODE, MODES as DEFAULT_MODES } from '../utils/sites.js';
 
 const STORAGE_KEYS = {
   LAST_QUERY_BY_MODE:     'lastQueryByMode',
@@ -92,10 +92,10 @@ export async function deleteMode(modeId) {
 export async function loadGroups(modeId) {
   try {
     const result = await browser.storage.local.get(STORAGE_KEYS.GROUPS_BY_MODE);
-    return result.groupsByMode?.[modeId] ?? [];
+    return result.groupsByMode?.[modeId] ?? DEFAULT_GROUPS_BY_MODE[modeId] ?? [];
   } catch (error) {
     console.error('Failed to load groups:', error);
-    return [];
+    return DEFAULT_GROUPS_BY_MODE[modeId] ?? [];
   }
 }
 
@@ -138,7 +138,6 @@ export async function loadSites(modeId) {
       STORAGE_KEYS.SITES_BY_MODE,
       STORAGE_KEYS.LEGACY_SITES,
     ]);
-
     if (result.sitesByMode != null) {
       const modeSites = result.sitesByMode[modeId];
       // null/undefined → default; [] is respected (user cleared intentionally)
@@ -180,7 +179,6 @@ export async function loadSelectedSites(modeId) {
       STORAGE_KEYS.SELECTED_SITES_BY_MODE,
       STORAGE_KEYS.LEGACY_SELECTED_SITES,
     ]);
-
     if (result.selectedSitesByMode != null) {
       const modeSelected = result.selectedSitesByMode[modeId];
       if (modeSelected && modeSelected.length > 0) return modeSelected;
@@ -210,4 +208,3 @@ export async function saveSelectedSites(modeId, siteIds) {
     console.error('Failed to save selected sites:', error);
   }
 }
-

@@ -316,3 +316,74 @@ export const DEFAULT_SITES_BY_MODE = {
     }
   ]
 };
+
+export const DEFAULT_GROUPS_BY_MODE = {
+  "manuscripts": [],
+  "art-objects": [],
+  "bibliography": [
+    {
+      "id": "digital-access",
+      "name": "Digital access",
+      "siteIds": [
+        "archive-org",
+        "google-scholar-de",
+        "google-books-de"
+      ]
+    },
+    {
+      "id": "metadata",
+      "name": "Metadata",
+      "siteIds": [
+        "worldcat",
+        "google-scholar-de",
+        "ixtheo",
+        "nli-rambi"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "id": "creative-commons",
+      "name": "Creative Commons",
+      "siteIds": [
+        "google-images-creative-commons",
+        "wikimedia-commons",
+        "flickr-creative-commons",
+        "duckduckgo-creative-commons",
+        "openverse"
+      ]
+    },
+    {
+      "id": "free-license",
+      "name": "Free license",
+      "siteIds": [
+        "unsplash",
+        "pixabay",
+        "open-clip-art",
+        "clker"
+      ]
+    },
+    {
+      "id": "photos",
+      "name": "Photos",
+      "siteIds": [
+        "google-images-creative-commons",
+        "unsplash",
+        "pixabay",
+        "wikimedia-commons",
+        "flickr-creative-commons",
+        "duckduckgo-creative-commons",
+        "openverse"
+      ]
+    },
+    {
+      "id": "clip-art",
+      "name": "Clip art",
+      "siteIds": [
+        "open-clip-art",
+        "clker"
+      ]
+    }
+  ],
+  "shopping": []
+};
