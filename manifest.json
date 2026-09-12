@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Multi-Search",
   "version": "1.0.0",
-  "description": "Search multiple bibliography sites simultaneously from a single interface.",
+  "description": "Search multiple sites simultaneously from a single interface.",
 
   "icons": {
     "16": "icons/icon-16.png",
@@ -38,7 +38,7 @@
     "gecko": {
       "id": "multi-search-bibliography@extension",
       "strict_min_version": "109.0",
-      "update_url": "https://github.com/nathangibson/multi-search/releases/download/v1.0.0/multi-search-plugin-1.0.0.xpi"
+      "update_url": "https://nathangibson.github.io/multi-search/updates.json"
     }
   }
 }

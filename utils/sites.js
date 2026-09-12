@@ -1,3 +1,5 @@
+// Generated from sites/*.json — do not edit by hand; edit the JSON and re-sync.
+
 export const MODES = [
   {
     "id": "art-objects",
@@ -73,64 +75,6 @@ export const DEFAULT_SITES = [
 ];
 
 export const DEFAULT_SITES_BY_MODE = {
-  "manuscripts": [
-    {
-      "id": "qalamos",
-      "name": "Qalamos",
-      "baseUrl": "",
-      "searchTemplate": "https://qalamos.net/servlets/solr/select?q=%2BobjectType%3A%22manuscript%22+-mymss_mssStatus%3A%22STAT0005%22+%2B%28allMeta%3A{query}+mymss_allmeta_diacr%3A{query}%29&fl=id%2CreturnId%2CobjectType%2Cscore%2Cstate&sort=objectType+asc%2Cmymss_mssInventWithOwner+asc&rows=50&version=4.5",
-      "enabled": true,
-      "order": 0
-    },
-    {
-      "id": "fihrist",
-      "name": "Fihrist",
-      "baseUrl": "",
-      "searchTemplate": "https://www.fihrist.org.uk/?q={query}",
-      "enabled": true,
-      "order": 1
-    },
-    {
-      "id": "cambridge-university-digital-library",
-      "name": "Cambridge University Digital Library",
-      "baseUrl": "",
-      "searchTemplate": "https://cudl.lib.cam.ac.uk/search?FacetCollection=&author=&keyword={query}&language=&location=&page=1&place=&shelfLocator=&subject=&title=",
-      "enabled": true,
-      "order": 2
-    },
-    {
-      "id": "sinai",
-      "name": "Sinai",
-      "baseUrl": "",
-      "searchTemplate": "https://sinaimanuscripts.library.ucla.edu/catalog?utf8=%E2%9C%93&search_field=all_fields&q={query}",
-      "enabled": true,
-      "order": 3
-    },
-    {
-      "id": "vatican",
-      "name": "Vatican",
-      "baseUrl": "",
-      "searchTemplate": "https://digi.vatlib.it/search?k_f=0&k_v={query}",
-      "enabled": true,
-      "order": 4
-    },
-    {
-      "id": "gallica-bnf",
-      "name": "Gallica BnF",
-      "baseUrl": "",
-      "searchTemplate": "https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&version=1.2&query=%28gallica%20all%20%22{query}%22%29%20and%20dc.type%20all%20%22manuscrit%22&lang=en&suggest=0",
-      "enabled": true,
-      "order": 5
-    },
-    {
-      "id": "kairawan",
-      "name": "Kairawan",
-      "baseUrl": "",
-      "searchTemplate": "https://kairawan.org/search?q={query}",
-      "enabled": true,
-      "order": 6
-    }
-  ],
   "art-objects": [
     {
       "id": "europeana",
@@ -297,6 +241,64 @@ export const DEFAULT_SITES_BY_MODE = {
       "order": 8
     }
   ],
+  "manuscripts": [
+    {
+      "id": "qalamos",
+      "name": "Qalamos",
+      "baseUrl": "",
+      "searchTemplate": "https://qalamos.net/servlets/solr/select?q=%2BobjectType%3A%22manuscript%22+-mymss_mssStatus%3A%22STAT0005%22+%2B%28allMeta%3A{query}+mymss_allmeta_diacr%3A{query}%29&fl=id%2CreturnId%2CobjectType%2Cscore%2Cstate&sort=objectType+asc%2Cmymss_mssInventWithOwner+asc&rows=50&version=4.5",
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "id": "fihrist",
+      "name": "Fihrist",
+      "baseUrl": "",
+      "searchTemplate": "https://www.fihrist.org.uk/?q={query}",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "cambridge-university-digital-library",
+      "name": "Cambridge University Digital Library",
+      "baseUrl": "",
+      "searchTemplate": "https://cudl.lib.cam.ac.uk/search?FacetCollection=&author=&keyword={query}&language=&location=&page=1&place=&shelfLocator=&subject=&title=",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "sinai",
+      "name": "Sinai",
+      "baseUrl": "",
+      "searchTemplate": "https://sinaimanuscripts.library.ucla.edu/catalog?utf8=%E2%9C%93&search_field=all_fields&q={query}",
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "vatican",
+      "name": "Vatican",
+      "baseUrl": "",
+      "searchTemplate": "https://digi.vatlib.it/search?k_f=0&k_v={query}",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "id": "gallica-bnf",
+      "name": "Gallica BnF",
+      "baseUrl": "",
+      "searchTemplate": "https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&version=1.2&query=%28gallica%20all%20%22{query}%22%29%20and%20dc.type%20all%20%22manuscrit%22&lang=en&suggest=0",
+      "enabled": true,
+      "order": 5
+    },
+    {
+      "id": "kairawan",
+      "name": "Kairawan",
+      "baseUrl": "",
+      "searchTemplate": "https://kairawan.org/search?q={query}",
+      "enabled": true,
+      "order": 6
+    }
+  ],
   "shopping": [
     {
       "id": "google-shopping",
@@ -318,7 +320,6 @@ export const DEFAULT_SITES_BY_MODE = {
 };
 
 export const DEFAULT_GROUPS_BY_MODE = {
-  "manuscripts": [],
   "art-objects": [],
   "bibliography": [
     {
@@ -385,5 +386,6 @@ export const DEFAULT_GROUPS_BY_MODE = {
       ]
     }
   ],
+  "manuscripts": [],
   "shopping": []
 };

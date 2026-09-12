@@ -6,7 +6,7 @@ import {
   loadLastQuery, saveLastQuery,
   getDefaultSites,
 } from '../storage/storage.js';
-import { DEFAULT_SITES } from '../utils/sites.js';
+import { DEFAULT_SITES, DEFAULT_SITES_BY_MODE, DEFAULT_GROUPS_BY_MODE } from '../utils/sites.js';
 
 let lastSet;
 
@@ -25,10 +25,10 @@ describe('loadSites', () => {
     expect(result).toEqual(DEFAULT_SITES);
   });
 
-  it('returns [] for images when sitesByMode is absent (no defaults for images)', async () => {
+  it('returns DEFAULT_SITES_BY_MODE.images for images when sitesByMode is absent', async () => {
     global.browser.storage.local.get = () => Promise.resolve({});
     const result = await loadSites('images');
-    expect(result).toEqual([]);
+    expect(result).toEqual(DEFAULT_SITES_BY_MODE.images);
   });
 
   it('returns stored sites for the requested mode', async () => {
@@ -55,7 +55,7 @@ describe('loadSites', () => {
     const legacy = [{ id: 'old', name: 'Old', searchTemplate: 'https://old.com/?q={query}', enabled: true, order: 0 }];
     global.browser.storage.local.get = () => Promise.resolve({ sites: legacy });
     const result = await loadSites('images');
-    expect(result).toEqual([]);
+    expect(result).toEqual(DEFAULT_SITES_BY_MODE.images);
   });
 });
 
@@ -108,10 +108,11 @@ describe('loadSelectedSites', () => {
     expect(result).toEqual(expected);
   });
 
-  it('returns [] for images when absent (no default sites for images)', async () => {
+  it('falls back to enabled defaults for images when absent', async () => {
     global.browser.storage.local.get = () => Promise.resolve({});
     const result = await loadSelectedSites('images');
-    expect(result).toEqual([]);
+    const expected = DEFAULT_SITES_BY_MODE.images.filter(s => s.enabled).map(s => s.id);
+    expect(result).toEqual(expected);
   });
 
   it('returns stored selectedSites for the mode when present and non-empty', async () => {
@@ -149,27 +150,36 @@ describe('getDefaultSites', () => {
     expect(getDefaultSites('bibliography')).toEqual(DEFAULT_SITES);
   });
 
-  it('returns [] for images (skeleton mode)', () => {
-    expect(getDefaultSites('images')).toEqual([]);
+  it('returns the mode defaults for all shipped modes', () => {
+    for (const [modeId, sites] of Object.entries(DEFAULT_SITES_BY_MODE)) {
+      expect(getDefaultSites(modeId)).toEqual(sites);
+    }
   });
 
-  it('returns [] for manuscripts (skeleton mode)', () => {
-    expect(getDefaultSites('manuscripts')).toEqual([]);
+  it('bibliography has 6 sites (per sites/bibliography.json)', () => {
+    expect(getDefaultSites('bibliography')).toHaveLength(6);
   });
 
-  it('returns [] for shopping (skeleton mode)', () => {
-    expect(getDefaultSites('shopping')).toEqual([]);
+  it('every site in every mode has id, name, searchTemplate with {query}', () => {
+    for (const sites of Object.values(DEFAULT_SITES_BY_MODE)) {
+      for (const site of sites) {
+        expect(typeof site.id).toBe('string');
+        expect(typeof site.name).toBe('string');
+        expect(site.searchTemplate).toContain('{query}');
+      }
+    }
   });
 
-  it('bibliography has 7 sites', () => {
-    expect(getDefaultSites('bibliography')).toHaveLength(7);
-  });
-
-  it('every bibliography site has id, name, searchTemplate with {query}', () => {
-    for (const site of getDefaultSites('bibliography')) {
-      expect(typeof site.id).toBe('string');
-      expect(typeof site.name).toBe('string');
-      expect(site.searchTemplate).toContain('{query}');
+  it('default groups reference existing site IDs in their mode', () => {
+    for (const [modeId, groups] of Object.entries(DEFAULT_GROUPS_BY_MODE)) {
+      const siteIds = new Set(getDefaultSites(modeId).map(s => s.id));
+      for (const group of groups) {
+        expect(typeof group.id).toBe('string');
+        expect(typeof group.name).toBe('string');
+        for (const siteId of group.siteIds) {
+          expect(siteIds.has(siteId)).toBe(true);
+        }
+      }
     }
   });
 });
