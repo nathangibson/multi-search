@@ -125,7 +125,7 @@ https://example.com/search?q={query_raw}
 
 ## Updating
 
-The add-on checks `updates.json` (served via GitHub Pages at `nathangibson.github.io/multi-search/updates.json`) for new versions. To ship an update:
+The add-on checks `updates.json` (served via GitHub Pages at `npgibson.com/multi-search/updates.json`) for new versions. To ship an update:
 
 1. Bump `version` in `manifest.json`
 2. Rebuild the `.xpi`

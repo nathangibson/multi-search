@@ -38,7 +38,7 @@
     "gecko": {
       "id": "multi-search-bibliography@extension",
       "strict_min_version": "109.0",
-      "update_url": "https://nathangibson.github.io/multi-search/updates.json"
+      "update_url": "https://npgibson.com/multi-search/updates.json"
     }
   }
 }
