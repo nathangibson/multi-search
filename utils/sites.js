@@ -304,7 +304,7 @@ export const DEFAULT_SITES_BY_MODE = {
       "id": "google-shopping",
       "name": "Google Shopping",
       "baseUrl": "",
-      "searchTemplate": "https://www.google.com/search?q={query}&udm=28&source=hp&iflsig=AFdpzrgAAAAAah_A7yO3wvyYpMr09Up9hjb8imYtX_cJ",
+      "searchTemplate": "https://www.google.com/search?q={query}&udm=3&uact=5&oq={query}",
       "enabled": true,
       "order": 0
     },
