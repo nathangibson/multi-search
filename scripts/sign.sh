@@ -1,7 +1,7 @@
 #!/bin/bash
 # Sign the Multi-Search extension as UNLISTED via AMO (addons.mozilla.org).
 # Unlisted = no public AMO page; you distribute the signed xpi yourself
-# (GitHub release + updates.json keeps working for unlisted add-ons).
+# (GitHub release + Pages download page).
 #
 # Prerequisites (one-time):
 #   1. Account at https://addons.mozilla.org/developers/
@@ -31,7 +31,7 @@ XPI="multi-search-plugin-${VERSION}.xpi"
 echo "==> Building $XPI from source..."
 rm -f "$XPI"
 zip -r "$XPI" manifest.json background.js sidebar/ settings/ sites/ storage/ utils/ icons/ \
-  -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "updates.json" "dist/*" > /dev/null
+  -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "dist/*" > /dev/null
 
 echo "==> Submitting to AMO for UNLISTED signing (channel: unlisted)..."
 # --channel unlisted: no public listing; --amo-metadata not needed

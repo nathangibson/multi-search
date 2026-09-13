@@ -37,7 +37,7 @@ jobs:
           # Create the xpi from source (same file set as scripts/sign.sh)
           zip -r multi-search-plugin-${RELEASE_TAG#v}.xpi \
             manifest.json background.js sidebar/ settings/ sites/ storage/ utils/ icons/ \
-            -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "updates.json" "dist/*"
+            -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "dist/*"
           # Sign as UNLISTED via AMO, poll until signed (passes secrets via env)
           web-ext sign \
             --channel unlisted \

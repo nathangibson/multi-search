@@ -41,7 +41,7 @@ Install from the pre-built `.xpi` (persists across browser restarts):
 
 ```bash
 zip -r multi-search-plugin-1.0.0.xpi manifest.json background.js sidebar/ settings/ sites/ storage/ utils/ icons/ \
-  -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "updates.json" "dist/*"
+  -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "dist/*"
 ```
 
 ---
@@ -134,7 +134,7 @@ To ship an update:
 3. Create a GitHub release and upload the signed `.xpi` for users who want to install manually
 4. Mozilla's AMO now hosts the update — installed copies update automatically on next Firefox check (usually within 24h)
 
-> The `update_url` / `updates.json` / GitHub Pages mechanism is now **obsolete** — it only applies to *unsigned, self-distributed* add-ons, which can only install on Developer Edition/Nightly/ESR. On AMO-signed add-ons that key is rejected by validation.
+> The old `update_url` / `updates.json` mechanism is obsolete — it only applied to *unsigned, self-distributed* add-ons, which can only install on Developer Edition/Nightly/ESR. On AMO-signed add-ons that key is rejected by validation. The GitHub Pages site (`npgibson.com/multi-search/`) remains as a convenient download page for the signed `.xpi`.
 
 ---
 
