@@ -1,0 +1,70 @@
+name: Build & Sign
+
+on:
+  release:
+    types: [published]
+  # Allow manual trigger for testing the workflow end-to-end
+  workflow_dispatch:
+
+jobs:
+  build-and-sign:
+    name: Build & sign xpi
+    runs-on: ubuntu-latest
+    if: github.event.release.draft == false || github.event_name == 'workflow_dispatch'
+
+    env:
+      # Auto-incremented tag from the release, e.g. v1.0.0
+      RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref_name }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install web-ext
+        run: npm install -g web-ext
+
+      - name: Lint the extension (web-ext lint)
+        run: web-ext lint --source-dir .
+
+      - name: Build & submit for unlisted signing
+        run: |
+          export PATH="$(npm config get prefix)/bin:$PATH"
+          # Create the xpi from source (same file set as scripts/sign.sh)
+          zip -r multi-search-plugin-${RELEASE_TAG#v}.xpi \
+            manifest.json background.js sidebar/ settings/ sites/ storage/ utils/ icons/ \
+            -x "node_modules/*" "tests/*" "package*.json" "*.md" ".git/*" "scripts/*" "updates.json" "dist/*"
+          # Sign as UNLISTED via AMO, poll until signed (passes secrets via env)
+          web-ext sign \
+            --channel unlisted \
+            --api-key "${{ secrets.AMO_JWT_ISSUER }}" \
+            --api-secret "${{ secrets.AMO_JWT_SECRET }}" \
+            --source-dir . \
+            --artifacts-dir "${{ runner.temp }}/dist"
+
+      - name: Verify signed artifact
+        run: |
+          ls -la "${{ runner.temp }}/dist/"
+          # Fail if web-ext didn't produce a signed xpi
+          test -n "$(find "${{ runner.temp }}/dist/" -name '*.xpi' | head -1)"
+
+      - name: Upload signed xpi to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # web-ext names signed output <name>-<version>-an+fx.xpi; upload the first signed file
+          XPI=$(find "${{ runner.temp }}/dist/" -name '*.xpi' | head -1)
+          gh release upload "${{ github.event.release.tag_name }}" "$XPI" --clobber
+          echo "Uploaded: $XPI"
+
+      - name: Upload signed xpi as workflow artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-xpi
+          path: ${{ runner.temp }}/dist/*.xpi
