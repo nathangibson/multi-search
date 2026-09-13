@@ -125,13 +125,16 @@ https://example.com/search?q={query_raw}
 
 ## Updating
 
-The add-on checks `updates.json` (served via GitHub Pages at `npgibson.com/multi-search/updates.json`) for new versions. To ship an update:
+Because the add-on is **signed by Mozilla via AMO**, Firefox manages updates automatically. AMO-hosted add-ons (listed or unlisted) **cannot set `update_url`** — Firefox checks AMO for the latest version, so automatic updates are handled entirely by Mozilla once you upload a new version.
+
+To ship an update:
 
 1. Bump `version` in `manifest.json`
-2. Rebuild the `.xpi`
-3. Create a GitHub release with the new `.xpi`
-4. Add a new entry to `updates.json` with the new version and its release download URL
-5. Commit and push — GitHub Pages serves the updated manifest
+2. Run the CI workflow (or `scripts/sign.sh`) to sign the new version via AMO
+3. Create a GitHub release and upload the signed `.xpi` for users who want to install manually
+4. Mozilla's AMO now hosts the update — installed copies update automatically on next Firefox check (usually within 24h)
+
+> The `update_url` / `updates.json` / GitHub Pages mechanism is now **obsolete** — it only applies to *unsigned, self-distributed* add-ons, which can only install on Developer Edition/Nightly/ESR. On AMO-signed add-ons that key is rejected by validation.
 
 ---
 
